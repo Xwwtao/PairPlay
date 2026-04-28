@@ -8,6 +8,7 @@ import SwiftUI
 
 struct PlayerView: View {
     let sessionState: ListeningSessionState
+    let now: Date
     let onLeave: () -> Void
 
     var body: some View {
@@ -64,9 +65,9 @@ struct PlayerView: View {
                     .tint(.primary)
 
                 HStack {
-                    Text(timeText(snapshot.positionSeconds))
+                    Text(TimeFormatter.playbackTime(snapshot.positionSeconds))
                     Spacer()
-                    Text(timeText(snapshot.durationSeconds))
+                    Text(TimeFormatter.playbackTime(snapshot.durationSeconds))
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -128,8 +129,8 @@ struct PlayerView: View {
 
     private var statusSubtitle: String {
         switch sessionState {
-        case .listeningTogether:
-            return "Shared for 0 min"
+        case .listeningTogether(_, let sharedSince):
+            return "Shared for \(TimeFormatter.sharedDuration(since:sharedSince, now: now))"
         case .joining:
             return "Trying to sync"
         case .listeningAlone:
@@ -141,12 +142,5 @@ struct PlayerView: View {
         case .idle:
             return ""
         }
-    }
-
-    private func timeText(_ seconds: Double) -> String {
-        let totalSeconds = Int(seconds)
-        let minutes = totalSeconds / 60
-        let remainingSeconds = totalSeconds % 60
-        return String(format: "%d:%02d", minutes, remainingSeconds)
     }
 }

@@ -11,7 +11,7 @@ struct SongCard: View {
     let snapshot: PlaybackSnapshot
     var buttonTitle: String = "Join Listening"
     let action: () -> Void
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             RoundedRectangle(cornerRadius: 24)
@@ -22,27 +22,27 @@ struct SongCard: View {
                         .font(.system(size: 56))
                         .foregroundStyle(.secondary)
                 }
-
+            
             VStack(alignment: .leading, spacing: 4) {
                 Text(snapshot.title)
                     .font(.title3)
                     .fontWeight(.semibold)
-
+                
                 Text(snapshot.artist)
                     .foregroundStyle(.secondary)
             }
-
+            
             ProgressView(value: snapshot.positionSeconds, total: snapshot.durationSeconds)
                 .tint(.primary)
-
+            
             HStack {
-                Text(timeText(snapshot.positionSeconds))
+                Text(TimeFormatter.playbackTime(snapshot.positionSeconds))
                 Spacer()
-                Text(timeText(snapshot.durationSeconds))
+                Text(TimeFormatter.playbackTime(snapshot.durationSeconds))
             }
             .font(.caption)
             .foregroundStyle(.secondary)
-
+            
             Button {
                 action()
             } label: {
@@ -57,12 +57,5 @@ struct SongCard: View {
         .padding(18)
         .background(.thinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 28))
-    }
-
-    private func timeText(_ seconds: Double) -> String {
-        let totalSeconds = Int(seconds)
-        let minutes = totalSeconds / 60
-        let remainingSeconds = totalSeconds % 60
-        return String(format: "%d:%02d", minutes, remainingSeconds)
     }
 }

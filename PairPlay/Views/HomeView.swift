@@ -32,6 +32,7 @@ struct HomeView: View{
             .navigationDestination(isPresented: $showPlayer){
                 PlayerView(
                     sessionState: viewModel.sessionState,
+                    now: viewModel.now,
                     onLeave: {
                         viewModel.leaveSession()
                         showPlayer = false
@@ -131,7 +132,7 @@ struct HomeView: View{
                 showPlayer = true
             }
 
-            Text("Shared for \(sharedMinutesText(since: sharedSince))")
+            Text("Shared for \(TimeFormatter.sharedDuration(since: sharedSince, now: viewModel.now))")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             connectionStatus
@@ -195,11 +196,5 @@ struct HomeView: View{
             }
             .buttonStyle(.bordered)
         }
-    }
-
-    private func sharedMinutesText(since: Date) -> String {
-        let seconds = Int(Date().timeIntervalSince(since))
-        let minutes = max(0, seconds / 60)
-        return "\(minutes) min"
     }
 }
