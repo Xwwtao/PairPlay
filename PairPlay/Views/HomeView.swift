@@ -18,16 +18,17 @@ struct HomeView: View{
                 Color(.systemBackground)
                     .ignoresSafeArea()
                 
-                VStack(alignment: .leading, spacing:24){
-                    header
-                    
-                    mainContent
-                    
-                    Spacer()
-                    
-                    debugButtons
+                ScrollView{
+                    VStack(alignment: .leading, spacing: 24){
+                        header
+                        
+                        mainContent
+                        
+                        debugButtons
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(24)
                 }
-                .padding(24)
             }
             .navigationDestination(isPresented: $showPlayer){
                 PlayerView(
