@@ -19,15 +19,48 @@ struct PlaybackSnapshot: Equatable {
     let updatedBy: String
     let serverTimestamp: Date
     
-    static let sample = PlaybackSnapshot(
-        trackId: "sample_track_001",
-        title: "Counting Stars",
-        artist: "OneRepublic",
-        isPlaying: true,
-        positionSeconds: 84,
-        durationSeconds: 228,
-        sequence: 1,
-        updatedBy: "partner",
-        serverTimestamp: Date()
-    )
+    static func sample(
+        title: String = "Wanted",
+        artist: String = "OneRepublic",
+        positionSeconds: Double = 84,
+        isPlaying: Bool = true,
+        sequence: Int = 1,
+        updatedBy: String = "partner"
+    ) -> PlaybackSnapshot {
+        PlaybackSnapshot(
+            trackId: "sample_track_001",
+            title: title,
+            artist: artist,
+            isPlaying: isPlaying,
+            positionSeconds: positionSeconds,
+            durationSeconds: 228,
+            sequence: sequence,
+            updatedBy: updatedBy,
+            serverTimestamp: Date()
+        )
+    }
+    
+    func copy(
+        trackId: String? = nil,
+        title: String? = nil,
+        artist: String? = nil,
+        isPlaying: Bool? = nil,
+        positionSeconds: Double? = nil,
+        durationSeconds: Double? = nil,
+        sequence: Int? = nil,
+        updatedBy: String? = nil,
+        serverTimestamp: Date? = nil
+    ) -> PlaybackSnapshot {
+        PlaybackSnapshot(
+            trackId: trackId ?? self.trackId,
+            title: title ?? self.title,
+            artist: artist ?? self.artist,
+            isPlaying: isPlaying ?? self.isPlaying,
+            positionSeconds: positionSeconds ?? self.positionSeconds,
+            durationSeconds: durationSeconds ?? self.durationSeconds,
+            sequence: sequence ?? self.sequence,
+            updatedBy: updatedBy ?? self.updatedBy,
+            serverTimestamp: serverTimestamp ?? self.serverTimestamp
+        )
+    }
 }

@@ -10,6 +10,9 @@ struct PlayerView: View {
     let sessionState: ListeningSessionState
     let now: Date
     let onLeave: () -> Void
+    let onTogglePlayPause: () -> Void
+    let onSeekForward: () -> Void
+    let onSeekBackward: () -> Void
 
     var body: some View {
         VStack(spacing: 28) {
@@ -60,12 +63,17 @@ struct PlayerView: View {
     @ViewBuilder
     private var progressSection: some View {
         if let snapshot = currentSnapshot {
+            let currentPosition = PlaybackPositionCalculator.currentPosition(
+                from: snapshot,
+                now: now
+            )
+            
             VStack(spacing: 8) {
-                ProgressView(value: snapshot.positionSeconds, total: snapshot.durationSeconds)
+                ProgressView(value: currentPosition, total: snapshot.durationSeconds)
                     .tint(.primary)
 
                 HStack {
-                    Text(TimeFormatter.playbackTime(snapshot.positionSeconds))
+                    Text(TimeFormatter.playbackTime(currentPosition))
                     Spacer()
                     Text(TimeFormatter.playbackTime(snapshot.durationSeconds))
                 }

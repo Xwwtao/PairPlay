@@ -33,7 +33,16 @@ struct HomeView: View{
                 PlayerView(
                     sessionState: viewModel.sessionState,
                     now: viewModel.now,
-                    onLeave: {
+                    onLeave:{
+                        viewModel.seekBackward15()
+                    },
+                    onTogglePlayPause:{
+                        viewModel.togglePlayPause()
+                    },
+                    onSeekForward: {
+                        viewModel.seekForward15()
+                    },
+                    onSeekBackward: {
                         viewModel.leaveSession()
                         showPlayer = false
                     }
@@ -103,7 +112,7 @@ struct HomeView: View{
                 .font(.title2)
                 .fontWeight(.medium)
 
-            SongCard(snapshot: snapshot) {
+            SongCard(snapshot: snapshot, now: viewModel.now) {
                 viewModel.joinListening()
             }
             connectionStatus
@@ -117,7 +126,7 @@ struct HomeView: View{
                 .font(.title2)
                 .fontWeight(.medium)
 
-            SongCard(snapshot: snapshot, buttonTitle: "Syncing") {}
+            SongCard(snapshot: snapshot, now:viewModel.now, buttonTitle: "Syncing") {}
                 .opacity(0.8)
             ProgressView()
         }
@@ -128,7 +137,7 @@ struct HomeView: View{
             Text("Listening together")
                 .font(.title2)
                 .fontWeight(.medium)
-            SongCard(snapshot: snapshot, buttonTitle: "Open Player") {
+            SongCard(snapshot: snapshot,now: viewModel.now, buttonTitle: "Open Player") {
                 showPlayer = true
             }
 
@@ -145,7 +154,7 @@ struct HomeView: View{
                 .font(.title2)
                 .fontWeight(.medium)
 
-            SongCard(snapshot: snapshot, buttonTitle: "Open Player") {
+            SongCard(snapshot: snapshot, now: viewModel.now,buttonTitle: "Open Player") {
                 showPlayer = true
             }
         }
