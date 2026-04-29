@@ -40,6 +40,40 @@ struct PlaybackSnapshot: Equatable {
         )
     }
     
+    static func sampleTrackTwo(
+        sequence: Int,
+        updatedBy: String = "partner"
+    ) -> PlaybackSnapshot {
+        PlaybackSnapshot(
+            trackId: "sample_track_002",
+            title: "Celebrity",
+            artist: "IU",
+            isPlaying: true,
+            positionSeconds: 0,
+            durationSeconds: 196,
+            sequence: sequence,
+            updatedBy: updatedBy,
+            serverTimestamp: Date()
+        )
+    }
+    
+    static func sampleTrackThree(
+        sequence: Int,
+        updatedBy: String = "partner"
+    ) -> PlaybackSnapshot {
+        PlaybackSnapshot(
+            trackId: "sample_track_003",
+            title: "Off My Face",
+            artist: "Justin Bieber",
+            isPlaying: true,
+            positionSeconds: 0,
+            durationSeconds: 156,
+            sequence: sequence,
+            updatedBy: updatedBy,
+            serverTimestamp: Date()
+        )
+    }
+    
     func copy(
         trackId: String? = nil,
         title: String? = nil,

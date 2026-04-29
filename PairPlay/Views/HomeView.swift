@@ -33,7 +33,7 @@ struct HomeView: View{
                 PlayerView(
                     sessionState: viewModel.sessionState,
                     now: viewModel.now,
-                    onLeave:{
+                    onSeekBackward:{
                         viewModel.seekBackward15()
                     },
                     onTogglePlayPause:{
@@ -42,14 +42,25 @@ struct HomeView: View{
                     onSeekForward: {
                         viewModel.seekForward15()
                     },
-                    onSeekBackward: {
+                    onSimulatePartnerChangeSong: {
+                        viewModel.simulatePartnerChangeSong()
+                    },
+                    onLeave: {
                         viewModel.leaveSession()
                         showPlayer = false
                     }
                 )
             }
             .sheet(isPresented: $showSettings){
-                SettingsView()
+                SettingsView(
+                    environmentState: viewModel.environmentState,
+                    onToggleQuietMode:{
+                        viewModel.toggleQuietMode()
+                    },
+                    onRetryConnection: {
+                        viewModel.simulateConnectionRestored()
+                    }
+                )
             }
         }
     }
@@ -183,9 +194,15 @@ struct HomeView: View{
     }
 
     private var connectionStatus: some View {
-        Text("Connected • Apple Music Ready")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
+        HStack(spacing: 6) {
+            Circle()
+                .frame(width: 7, height: 7)
+                .foregroundStyle(viewModel.environmentState.connectionState.isConnected ? .green : .orange)
+
+            Text("\(viewModel.environmentState.connectionState.displayValue) • Apple Music \(viewModel.environmentState.appleMusicState.displayValue)")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
     }
 
     private var debugButtons: some View {
@@ -203,7 +220,51 @@ struct HomeView: View{
                     viewModel.simulatePartnerListening()
                 }
             }
-            .buttonStyle(.bordered)
+            
+            HStack{
+                Button("Partner Play/Pause"){
+                    viewModel.simulatePartnerTogglePlayPause()
+                }
+                Button("Partner +15"){
+                    viewModel.simulatePartnerSeekForward15()
+                }
+            }
+            
+            HStack {
+                Button("Partner -15") {
+                    viewModel.simulatePartnerSeekBackward15()
+                }
+                Button("Partner Song") {
+                    viewModel.simulatePartnerChangeSong()
+                }
+            }
+
+            HStack {
+                Button("Old Event") {
+                    viewModel.simulateOldRemoteEvent()
+                }
+            }
+            
+            HStack {
+                Button("Connection Issue") {
+                    viewModel.simulateConnectionIssue()
+                }
+
+                Button("Connection OK") {
+                    viewModel.simulateConnectionRestored()
+                }
+            }
+
+            HStack {
+                Button("AM Denied") {
+                    viewModel.simulateAppleMusicDenied()
+                }
+
+                Button("AM Ready") {
+                    viewModel.simulateAppleMusicReady()
+                }
+            }
         }
+        .buttonStyle(.bordered)
     }
 }

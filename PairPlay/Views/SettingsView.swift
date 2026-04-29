@@ -1,42 +1,19 @@
-//
-//  SettingsView.swift
-//  PairPlay
-//
-//  Created by Wentao Xie on 2026/4/28.
-//
 import SwiftUI
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var quietMode = false
+
+    let environmentState: AppEnvironmentState
+    let onToggleQuietMode: () -> Void
+    let onRetryConnection: () -> Void
 
     var body: some View {
         NavigationStack {
             Form {
-                Section("Pair") {
-                    HStack {
-                        Text("Connected with")
-                        Spacer()
-                        Text("Her")
-                            .foregroundStyle(.secondary)
-                    }
-                }
-
-                Section("Status") {
-                    statusRow(title: "Apple Music", value: "Ready")
-                    statusRow(title: "Connection", value: "Connected")
-                    statusRow(title: "Permissions", value: "Granted")
-                }
-
-                Section("Listening Mode") {
-                    Toggle("Quiet Mode", isOn: $quietMode)
-                }
-
-                Section {
-                    Button("Retry Connection") {}
-
-                    Button("Disconnect Pair", role: .destructive) {}
-                }
+                pairSection
+                statusSection
+                listeningModeSection
+                actionsSection
             }
             .navigationTitle("Settings")
             .toolbar {
@@ -49,12 +26,95 @@ struct SettingsView: View {
         }
     }
 
-    private func statusRow(title: String, value: String) -> some View {
-        HStack {
-            Text(title)
-            Spacer()
-            Text(value)
+    private var pairSection: some View {
+        Section("Pair") {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(environmentState.pairState.displayTitle)
+                    .font(.body)
+
+                Text(environmentState.pairState.displaySubtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.vertical, 4)
+        }
+    }
+
+    private var statusSection: some View {
+        Section("Status") {
+            statusRow(
+                title: "Apple Music",
+                value: environmentState.appleMusicState.displayValue,
+                detail: environmentState.appleMusicState.displayDetail
+            )
+
+            statusRow(
+                title: "Connection",
+                value: environmentState.connectionState.displayValue,
+                detail: environmentState.connectionState.displayDetail
+            )
+
+            statusRow(
+                title: "Permissions",
+                value: environmentState.appleMusicState.authorization.displayValue,
+                detail: "Required for Apple Music playback"
+            )
+        }
+    }
+
+    private var listeningModeSection: some View {
+        Section("Listening Mode") {
+            Button {
+                onToggleQuietMode()
+            } label: {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Quiet Mode")
+                            .foregroundStyle(.primary)
+
+                        Text("See partner activity without strong join prompts")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Spacer()
+
+                    Text(environmentState.quietModeEnabled ? "On" : "Off")
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
+    private var actionsSection: some View {
+        Section {
+            Button("Retry Connection") {
+                onRetryConnection()
+            }
+
+            Button("Disconnect Pair", role: .destructive) {
+                // MVP: no action yet
+            }
+        }
+    }
+
+    private func statusRow(
+        title: String,
+        value: String,
+        detail: String
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(title)
+                Spacer()
+                Text(value)
+                    .foregroundStyle(.secondary)
+            }
+
+            Text(detail)
+                .font(.caption)
                 .foregroundStyle(.secondary)
         }
+        .padding(.vertical, 2)
     }
 }
