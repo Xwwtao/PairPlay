@@ -14,10 +14,19 @@ final class HomeViewModel: ObservableObject {
     @Published var now: Date = Date()
     @Published var environmentState: AppEnvironmentState = .mockReady
     
+    private let musicEnvironmentService: MusicEnvironmentService
+    private let playbackSyncService: PlaybackSyncService
     private var timer: Timer?
     
-    init() {
+    init(
+        musicEnvironmentService: MusicEnvironmentService? = nil,
+        playbackSyncService: PlaybackSyncService? = nil
+    ) {
+        self.musicEnvironmentService = musicEnvironmentService ?? MockMusicEnvironmentService()
+        self.playbackSyncService = playbackSyncService ?? MockPlaybackSyncService()
         startTimer()
+        startPlaybackSync()
+        refreshAppleMusicState()
     }
     
     deinit{
@@ -72,6 +81,8 @@ final class HomeViewModel: ObservableObject {
             updatedSnapshot,
             to: sessionState
         )
+
+        sendSnapshotToSyncService(updatedSnapshot)
     }
 
     func performRemoteAction(_ action: PlaybackAction) {
@@ -86,7 +97,7 @@ final class HomeViewModel: ObservableObject {
             return
         }
 
-        applyRemoteSnapshot(remoteSnapshot)
+        simulateIncomingRemoteSnapshot(remoteSnapshot)
     }
     
     func togglePlayPause() {
@@ -106,11 +117,11 @@ final class HomeViewModel: ObservableObject {
     }
 
     func simulatePartnerSeekForward15() {
-        performLocalAction(.seekBy(15))
+        performRemoteAction(.seekBy(15))
     }
 
     func simulatePartnerSeekBackward15() {
-        performLocalAction(.seekBy(-15))
+        performRemoteAction(.seekBy(-15))
     }
 
     func simulatePartnerChangeSong() {
@@ -177,11 +188,39 @@ final class HomeViewModel: ObservableObject {
         environmentState.appleMusicState = .mockReady
     }
 
+    func refreshAppleMusicState() {
+        Task {
+            let state = await musicEnvironmentService.currentAppleMusicState()
+            environmentState.appleMusicState = state
+        }
+    }
+
     private func applyRemoteSnapshot(_ remoteSnapshot: PlaybackSnapshot) {
         sessionState = SyncReducer.applySnapshot(
             remoteSnapshot,
             to: sessionState
         )
+    }
+
+    private func startPlaybackSync() {
+        playbackSyncService.startListening { [weak self] snapshot in
+            self?.applyRemoteSnapshot(snapshot)
+        }
+    }
+
+    private func sendSnapshotToSyncService(_ snapshot: PlaybackSnapshot) {
+        Task {
+            await playbackSyncService.sendSnapshot(snapshot)
+        }
+    }
+
+    private func simulateIncomingRemoteSnapshot(_ snapshot: PlaybackSnapshot) {
+        guard let debugSyncService = playbackSyncService as? DebugPlaybackSyncService else {
+            applyRemoteSnapshot(snapshot)
+            return
+        }
+
+        debugSyncService.simulateIncomingSnapshot(snapshot)
     }
 
     private func startTimer() {
